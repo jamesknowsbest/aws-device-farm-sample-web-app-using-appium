@@ -16,7 +16,7 @@
 package Tests.AbstractBaseTests;
 
 import io.appium.java_client.MobileElement;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.annotations.*;
 
@@ -37,7 +37,7 @@ public abstract class TestBase {
      * Make the driver static. This allows it to be created only once
      * and used across all of the test classes.
      */
-    public static AndroidDriver<MobileElement> driver;
+    public static IOSDriver<MobileElement> driver;
 
     /**
      * This method runs before any other method.
@@ -61,7 +61,7 @@ public abstract class TestBase {
 	 * running on Device Farm's server. The settings made here will be ignored or may have
 	 * unexpected results.
 	 */
-        driver = new AndroidDriver<MobileElement>(url, new DesiredCapabilities());
+        driver = new IOSDriver<MobileElement>(url, new DesiredCapabilities());
 
         //Use a higher value if your mobile elements take time to show up.
         driver.manage().timeouts().implicitlyWait(TIMEOUT, TimeUnit.SECONDS);
