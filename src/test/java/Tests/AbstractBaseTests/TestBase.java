@@ -15,7 +15,9 @@
 
 package Tests.AbstractBaseTests;
 
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.MobileElement;
+import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.annotations.*;
@@ -25,8 +27,8 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 /**
- * An abstract base for all of the Android tests within this package
- * responsible for setting up the Appium test Driver
+ * An abstract base for all of the Android tests within this package responsible
+ * for setting up the Appium test Driver
  */
 public abstract class TestBase {
 
@@ -34,34 +36,39 @@ public abstract class TestBase {
     private final int TIMEOUT = 30;
 
     /**
-     * Make the driver static. This allows it to be created only once
-     * and used across all of the test classes.
+     * Make the driver static. This allows it to be created only once and used
+     * across all of the test classes.
      */
-    public static IOSDriver<MobileElement> driver;
+    public static AppiumDriver<MobileElement> driver;
 
     /**
      * This method runs before any other method.
      *
-     * Appium follows a client - server model:
-     * We are setting up our appium client in order to connect to Device Farm's appium server.
+     * Appium follows a client - server model: We are setting up our appium client
+     * in order to connect to Device Farm's appium server.
      *
-     * We do not need to and SHOULD NOT set our own DesiredCapabilities
-     * Device Farm creates custom settings at the server level. Setting your own DesiredCapabilities
-     * will result in unexpected results and failures.
+     * We do not need to and SHOULD NOT set our own DesiredCapabilities Device Farm
+     * creates custom settings at the server level. Setting your own
+     * DesiredCapabilities will result in unexpected results and failures.
      *
      * @throws MalformedURLException An exception that occurs when the URL is wrong
      */
     @BeforeSuite
-    public void setUpAppium() throws MalformedURLException{
+    public void setUpAppium() throws MalformedURLException {
 
         URL url = new URL(URL_STRING);
 
-	/*
-	 * As mentioned in the documentation above we should not set the capabilities when 
-	 * running on Device Farm's server. The settings made here will be ignored or may have
-	 * unexpected results.
-	 */
-        driver = new IOSDriver<MobileElement>(url, new DesiredCapabilities());
+        /*
+         * As mentioned in the documentation above we should not set the capabilities
+         * when running on Device Farm's server. The settings made here will be ignored
+         * or may have unexpected results.
+         */
+        String platform = System.getenv("DEVICEFARM_DEVICE_PLATFORM_NAME");
+        if (platform.equalsIgnoreCase("ios")) {
+            driver = new IOSDriver<MobileElement>(url, new DesiredCapabilities());
+        } else {
+            driver = new AndroidDriver<MobileElement>(url, new DesiredCapabilities());
+        }
 
         //Use a higher value if your mobile elements take time to show up.
         driver.manage().timeouts().implicitlyWait(TIMEOUT, TimeUnit.SECONDS);
