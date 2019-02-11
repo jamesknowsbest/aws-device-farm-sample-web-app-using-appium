@@ -16,8 +16,15 @@
 package Tests;
 
 import java.io.File;
+import java.util.List;
+
 import Tests.AbstractBaseTests.TestBase;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.testng.annotations.Test;
 
@@ -27,17 +34,52 @@ import org.testng.annotations.Test;
 public class ScreenshotTest extends TestBase {
 
     private final String TEST_URL = "http://docs.aws.amazon.com/devicefarm/latest/developerguide/welcome.html";
-
+	private static final int MAX_WEBSITE_LOAD_TIME = 100;
+	private final String TEST_LATENCY_URL = "http://speedtest.googlefiber.net/";
     @Test
     public void testScreenshot() throws InterruptedException {
 
-	Thread.sleep(5000);
-	driver.get(TEST_URL);
-	Thread.sleep(5000);
-	// This will store the screenshot under /tmp on your local machine
-	String screenshotDir = System.getProperty("appium.screenshots.dir", System.getProperty("java.io.tmpdir", ""));
-	File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-	screenshot.renameTo(new File(screenshotDir, "device_farm.png"));
+		Thread.sleep(5000);
+		driver.get(TEST_URL);
+		Thread.sleep(5000);
+		// This will store the screenshot under /tmp on your local machine
+		String screenshotDir = System.getProperty("appium.screenshots.dir", System.getProperty("java.io.tmpdir", ""));
+		File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+		screenshot.renameTo(new File(screenshotDir, "device_farm.png"));
 
+	}
+	
+	@Test  public void testLatency() throws InterruptedException{
+		Thread.sleep(5000);
+		driver.get(TEST_LATENCY_URL);
+		Thread.sleep(5000);
+		
+        // This will store the screenshot under /tmp on your local machine
+        String screenshotDir = System.getProperty("appium.screenshots.dir", System.getProperty("java.io.tmpdir", ""));
+        File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        screenshot.renameTo(new File(screenshotDir, "test_starting.png"));
+
+        //create the web driver
+        Object[] contextHandles = driver.getContextHandles().toArray();
+        String webViewContent = (String) contextHandles[contextHandles.length - 1];
+        WebDriver webDriver = driver.context(webViewContent);
+
+        //click on start btn
+        WebElement runTestBtn = webDriver.findElement(By.id("run-test"));
+        runTestBtn.click();
+
+        // click on continue button if it's there
+        List<WebElement> continueBtn = webDriver.findElements(By.id("view39"));
+        for (WebElement btn : continueBtn) {
+            btn.click();
+        }
+
+        //wait for the test to stop
+        WebDriverWait wait = new WebDriverWait(webDriver, MAX_WEBSITE_LOAD_TIME);
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("view32")));
+
+        //take a new screen shot
+        screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        screenshot.renameTo(new File(screenshotDir, "test_finished.png"));
     }
 }
