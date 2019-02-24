@@ -64,18 +64,22 @@ public class ScreenshotTest extends TestBase {
         String webViewContent = (String) contextHandles[contextHandles.length - 1];
         WebDriver webDriver = driver.context(webViewContent);
 
+        WebDriverWait wait = new WebDriverWait(webDriver, MAX_WEBSITE_LOAD_TIME);
+
+        // wait for page to load fully
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("run-test")));
         //click on start btn
         WebElement runTestBtn = webDriver.findElement(By.id("run-test"));
         runTestBtn.click();
 
         // click on continue button if it's there
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("view39")));
         List<WebElement> continueBtn = webDriver.findElements(By.id("view39"));
         for (WebElement btn : continueBtn) {
             btn.click();
         }
 
         //wait for the test to stop
-        WebDriverWait wait = new WebDriverWait(webDriver, MAX_WEBSITE_LOAD_TIME);
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("view32")));
 
         //take a new screen shot
